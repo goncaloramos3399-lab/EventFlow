@@ -7,16 +7,19 @@ Aplicação web centralizada para criar, divulgar, gerir inscrições e monitori
 * **Rafael Pereira Carvalho** – N.º 36129
 * **Simão Alexandre Nogueira Santos** – N.º 36165
 
-## 🎯 Funcionalidades Principais
-* **RF01 – Gestão de Utilizadores:** Registo, autenticação e recuperação de palavra-passe.
-* **RF02 – Gestão de Eventos:** Criação, edição, publicação e cancelamento de eventos.
-* **RF03 – Pesquisa e Filtragem:** Procura por nome, categoria, data ou localização.
-* **RF04 – Inscrição em Eventos:** Controlo de vagas em tempo real sem *overbooking*.
-* **RF05 – Gestão de Bilhetes/Check-in:** Emissão de comprovativos únicos (QR Code).
-* **RF06 – Painel do Organizador:** Estatísticas de adesão, lista de inscritos e exportação.
+## 🛠️ Tecnologias Utilizadas
+* **Backend:** Python 3 com Flask
+* **Frontend:** HTML5, CSS3 (Design Responsivo) e Jinja2
+* **Base de Dados:** SQLite (com integridade referencial e controlo transacional de vagas)
 
-## 📅 Planeamento (Sprints)
-* [x] **Sprint 1:** Requisitos, arquitetura preliminar, configuração do GitHub e wireframes.
-* [ ] **Sprint 2:** Base de dados, autenticação de utilizadores e CRUD de eventos.
-* [ ] **Sprint 3:** Sistema de inscrições, geração de QR Code e painel do organizador.
-* [ ] **Sprint 4:** Testes de integração, correção de erros e documentação final.
+## 🚀 Como Executar o Projeto Localmente
+1. Clonar o repositório: `git clone https://github.com`
+2. Instalar a dependência: `pip install flask`
+3. Iniciar o servidor: `python app.py`
+4. Aceder no navegador a: `http://127.0.0.1:5000`
+
+## 📅 Estado do Planeamento (Sprints)
+* [x] **Sprint 1:** Requisitos, arquitetura, configuração do GitHub e wireframes.
+* [x] **Sprint 2:** Base de dados, autenticação cifrada e CRUD/pesquisa de eventos.
+* [x] **Sprint 3:** Sistema de inscrições sem *overbooking*, bilhetes com QR Code e painel do organizador.
+* [x] **Sprint 4:** Testes de integração, validação final e documentação.
