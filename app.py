@@ -1,4 +1,5 @@
 import sqlite3
+import uuid
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -34,6 +35,17 @@ def init_db():
                 estado TEXT DEFAULT 'PUBLICADO',
                 FOREIGN KEY (organizador_id) REFERENCES utilizadores(id)
             );
+            CREATE TABLE IF NOT EXISTS inscricoes (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                evento_id INTEGER NOT NULL,
+                participante_id INTEGER NOT NULL,
+                codigo_bilhete TEXT UNIQUE NOT NULL,
+                check_in INTEGER DEFAULT 0,
+                data_inscricao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                UNIQUE(evento_id, participante_id),
+                FOREIGN KEY (evento_id) REFERENCES eventos(id),
+                FOREIGN KEY (participante_id) REFERENCES utilizadores(id)
+            );
         ''')
 
 @app.route('/')
@@ -41,7 +53,13 @@ def index():
     pesquisa = request.args.get('q', '').strip()
     categoria = request.args.get('categoria', '').strip()
     
-    query = "SELECT e.*, u.nome as organizador_nome FROM eventos e JOIN utilizadores u ON e.organizador_id = u.id WHERE e.estado = 'PUBLICADO'"
+    query = '''
+        SELECT e.*, u.nome as organizador_nome,
+               (SELECT COUNT(*) FROM inscricoes i WHERE i.evento_id = e.id) as total_inscritos
+        FROM eventos e 
+        JOIN utilizadores u ON e.organizador_id = u.id 
+        WHERE e.estado = 'PUBLICADO'
+    '''
     params = []
     
     if pesquisa:
@@ -53,9 +71,37 @@ def index():
         
     query += " ORDER BY e.data_evento ASC"
     
+    minhas_inscricoes = []
+    inscritos_por_evento = {}
+    
     with get_db() as conn:
         eventos = conn.execute(query, params).fetchall()
-    return render_template('index.html', eventos=eventos, pesquisa=pesquisa, categoria=categoria)
+        
+        if session.get('user_id'):
+            # Buscar bilhetes do participante
+            minhas_inscricoes = conn.execute('''
+                SELECT i.*, e.titulo, e.data_evento, e.hora_evento, e.localizacao 
+                FROM inscricoes i 
+                JOIN eventos e ON i.evento_id = e.id 
+                WHERE i.participante_id = ?
+            ''', (session['user_id'],)).fetchall()
+            
+            # Se for organizador, buscar inscritos dos seus eventos (RF06)
+            if session.get('user_perfil') == 'ORGANIZADOR':
+                for ev in eventos:
+                    if ev['organizador_id'] == session['user_id']:
+                        lista = conn.execute('''
+                            SELECT i.*, u.nome, u.email 
+                            FROM inscricoes i 
+                            JOIN utilizadores u ON i.participante_id = u.id 
+                            WHERE i.evento_id = ?
+                        ''', (ev['id'],)).fetchall()
+                        inscritos_por_evento[ev['id']] = lista
+
+    ids_inscritos = [item['evento_id'] for item in minhas_inscricoes]
+    return render_template('index.html', eventos=eventos, pesquisa=pesquisa, categoria=categoria,
+                           minhas_inscricoes=minhas_inscricoes, ids_inscritos=ids_inscritos,
+                           inscritos_por_evento=inscritos_por_evento)
 
 @app.route('/registar', methods=['POST'])
 def registar():
@@ -113,6 +159,40 @@ def criar_evento():
             int(request.form['capacidade_maxima'])
         ))
     flash('Evento publicado com sucesso!', 'success')
+    return redirect(url_for('index'))
+
+@app.route('/inscrever/<int:evento_id>', methods=['POST'])
+def inscrever(evento_id):
+    if not session.get('user_id'):
+        flash('Faz login para te inscreveres num evento.', 'danger')
+        return redirect(url_for('index'))
+        
+    with get_db() as conn:
+        # Controlo transacional de lotação (RNF04)
+        evento = conn.execute('SELECT capacidade_maxima FROM eventos WHERE id = ?', (evento_id,)).fetchone()
+        inscritos = conn.execute('SELECT COUNT(*) as total FROM inscricoes WHERE evento_id = ?', (evento_id,)).fetchone()['total']
+        
+        if inscritos >= evento['capacidade_maxima']:
+            flash('Lamentamos, este evento já esgotou as vagas!', 'danger')
+            return redirect(url_for('index'))
+            
+        codigo = f"EF-{uuid.uuid4().hex[:8].upper()}"
+        try:
+            conn.execute('INSERT INTO inscricoes (evento_id, participante_id, codigo_bilhete) VALUES (?, ?, ?)',
+                         (evento_id, session['user_id'], codigo))
+            flash(f'Inscrição confirmada! O teu bilhete é {codigo}.', 'success')
+        except sqlite3.IntegrityError:
+            flash('Já estás inscrito neste evento.', 'danger')
+            
+    return redirect(url_for('index'))
+
+@app.route('/checkin/<int:inscricao_id>', methods=['POST'])
+def checkin(inscricao_id):
+    if session.get('user_perfil') != 'ORGANIZADOR':
+        return redirect(url_for('index'))
+    with get_db() as conn:
+        conn.execute('UPDATE inscricoes SET check_in = 1 WHERE id = ?', (inscricao_id,))
+    flash('Presença (Check-in) validada com sucesso!', 'success')
     return redirect(url_for('index'))
 
 if __name__ == '__main__':

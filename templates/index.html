@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt pt">
+<html lang="pt">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -15,49 +15,49 @@
             --border: #e5e7eb;
             --success: #10b981;
             --warning: #f59e0b;
+            --danger: #ef4444;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
         body { background-color: var(--bg); color: var(--text); line-height: 1.6; }
 
-        /* Barra Superior */
         .navbar { background: linear-gradient(135deg, #4f46e5, #6366f1); color: white; padding: 1rem 2rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         .nav-container { max-width: 1100px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
         .brand { font-size: 1.5rem; font-weight: 800; color: white; text-decoration: none; }
         .nav-actions { display: flex; align-items: center; gap: 12px; }
 
-        /* Botões */
-        .btn { padding: 0.65rem 1.2rem; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 0.95rem; text-decoration: none; display: inline-block; text-align: center; }
+        .btn { padding: 0.6rem 1.1rem; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 0.9rem; text-decoration: none; display: inline-block; text-align: center; }
         .btn-primary { background: var(--primary); color: white; width: 100%; }
         .btn-primary:hover { background: var(--primary-hover); }
         .btn-warning { background: var(--warning); color: white; width: 100%; }
-        .btn-warning:hover { background: #d97706; }
         .btn-success { background: var(--success); color: white; }
+        .btn-disabled { background: #9ca3af; color: white; width: 100%; cursor: not-allowed; }
         .btn-outline { background: transparent; border: 1.5px solid white; color: white; padding: 0.4rem 1rem; }
 
-        /* Contentor e Grelhas */
         .container { max-width: 1100px; margin: 2rem auto; padding: 0 1.5rem; }
         .auth-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
         .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
         .full-width { grid-column: 1 / -1; }
 
-        /* Cartões e Inputs */
         .card { background: var(--card); border-radius: 12px; padding: 1.5rem; box-shadow: 0 2px 10px rgba(0,0,0,0.06); border: 1px solid var(--border); margin-bottom: 1.5rem; }
         .card-title { font-size: 1.2rem; font-weight: 700; margin-bottom: 1rem; color: var(--primary); }
         .stack { display: flex; flex-direction: column; gap: 12px; }
         input, select, textarea { width: 100%; padding: 0.65rem 0.9rem; border: 1.5px solid var(--border); border-radius: 8px; font-size: 0.95rem; }
-        input:focus, select:focus, textarea:focus { border-color: var(--primary); outline: none; }
 
-        /* Alertas */
         .alert { padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; font-weight: 600; }
         .alert-success { background: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
         .alert-danger { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
 
-        /* Pesquisa e Eventos */
         .search-bar { display: grid; grid-template-columns: 2fr 1fr auto; gap: 12px; background: white; padding: 1rem; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); margin-bottom: 2rem; }
-        .events-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(310px, 1fr)); gap: 1.5rem; }
-        .event-card { background: white; border-radius: 12px; padding: 1.5rem; border: 1px solid var(--border); box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .events-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(310px, 1fr)); gap: 1.5rem; margin-bottom: 2.5rem; }
+        .event-card { background: white; border-radius: 12px; padding: 1.5rem; border: 1px solid var(--border); box-shadow: 0 4px 6px rgba(0,0,0,0.05); display: flex; flex-direction: column; justify-content: space-between; }
         .badge { display: inline-block; background: #e0e7ff; color: var(--primary); font-size: 0.75rem; font-weight: 700; padding: 0.25rem 0.7rem; border-radius: 999px; margin-bottom: 0.75rem; }
-        .event-meta { list-style: none; font-size: 0.9rem; color: #374151; border-top: 1px solid var(--border); padding-top: 0.8rem; margin-top: 0.8rem; }
+        .event-meta { list-style: none; font-size: 0.9rem; color: #374151; border-top: 1px solid var(--border); padding-top: 0.8rem; margin: 0.8rem 0; }
+
+        /* Bilhetes e Tabelas */
+        .ticket-card { display: flex; align-items: center; justify-content: space-between; background: #f8fafc; border: 2px dashed var(--primary); border-radius: 12px; padding: 1rem; margin-bottom: 1rem; }
+        table { width: 100%; border-collapse: collapse; margin-top: 0.8rem; font-size: 0.9rem; }
+        th, td { padding: 0.6rem; text-align: left; border-bottom: 1px solid var(--border); }
+        th { background: #f9fafb; font-weight: 700; }
     </style>
 </head>
 <body>
@@ -84,7 +84,6 @@
     {% endwith %}
 
     {% if not session.get('user_id') %}
-    <!-- Cartões visíveis diretamente sem precisar de pop-up -->
     <div class="auth-grid">
         <div class="card">
             <div class="card-title">🔑 Iniciar Sessão</div>
@@ -111,6 +110,30 @@
     </div>
     {% endif %}
 
+    <!-- Meus Bilhetes com QR Code (RF05) -->
+    {% if minhas_inscricoes %}
+    <div class="card">
+        <div class="card-title">🎫 Os Meus Bilhetes (QR Code)</div>
+        {% for b in minhas_inscricoes %}
+        <div class="ticket-card">
+            <div>
+                <h4 style="color: var(--primary);">{{ b['titulo'] }}</h4>
+                <p style="font-size: 0.9rem;">📅 {{ b['data_evento'] }} às {{ b['hora_evento'] }} | 📍 {{ b['localizacao'] }}</p>
+                <p style="margin-top: 0.4rem;"><strong>Código:</strong> <code>{{ b['codigo_bilhete'] }}</code> 
+                {% if b['check_in'] == 1 %}
+                    <span style="color: var(--success); font-weight: bold;">✅ Check-in Realizado</span>
+                {% else %}
+                    <span style="color: var(--warning); font-weight: bold;">⏳ Aguardar Entrada</span>
+                {% endif %}
+                </p>
+            </div>
+            <img src="https://qrserver.com{{ b['codigo_bilhete'] }}" alt="QR Code">
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Criar Evento + Painel do Organizador (RF02 e RF06) -->
     {% if session.get('user_perfil') == 'ORGANIZADOR' %}
     <div class="card">
         <div class="card-title">✨ Criar Novo Evento</div>
@@ -132,41 +155,18 @@
             </div>
         </form>
     </div>
-    {% endif %}
 
-    <form method="GET" action="/" class="search-bar">
-        <input type="text" name="q" value="{{ pesquisa }}" placeholder="Pesquisar evento por nome ou localização...">
-        <select name="categoria">
-            <option value="">Todas as Categorias</option>
-            <option value="Académico" {% if categoria == 'Académico' %}selected{% endif %}>Académico</option>
-            <option value="Tecnologia" {% if categoria == 'Tecnologia' %}selected{% endif %}>Tecnologia</option>
-            <option value="Cultural" {% if categoria == 'Cultural' %}selected{% endif %}>Cultural</option>
-            <option value="Desporto" {% if categoria == 'Desporto' %}selected{% endif %}>Desporto</option>
-        </select>
-        <button type="submit" class="btn btn-primary" style="width: auto;">Filtrar</button>
-    </form>
-
-    <h2 style="margin-bottom: 1rem;">Eventos Disponíveis</h2>
-    <div class="events-grid">
-        {% for e in eventos %}
-        <div class="event-card">
-            <span class="badge">{{ e['categoria'] }}</span>
-            <h3>{{ e['titulo'] }}</h3>
-            <p style="color: var(--muted); font-size: 0.9rem; margin-top: 0.4rem;">{{ e['descricao'] }}</p>
-            <ul class="event-meta">
-                <li>📅 <strong>Data:</strong> {{ e['data_evento'] }} às {{ e['hora_evento'] }}</li>
-                <li>📍 <strong>Local:</strong> {{ e['localizacao'] }}</li>
-                <li>👥 <strong>Vagas:</strong> {{ e['capacidade_maxima'] }} lugares</li>
-                <li>👤 <strong>Organizador:</strong> {{ e['organizador_nome'] }}</li>
-            </ul>
-        </div>
-        {% else %}
-        <div class="card full-width" style="text-align: center; color: var(--muted);">
-            Ainda não existem eventos publicados. Cria uma conta de <strong>Organizador</strong> acima para adicionar o primeiro!
-        </div>
-        {% endfor %}
-    </div>
-</div>
-
-</body>
-</html>
+    <div class="card">
+        <div class="card-title">📊 Painel do Organizador (Ocupação e Check-in)</div>
+        {% for e in eventos if e['organizador_id'] == session['user_id'] %}
+            {% set ocupacao = ((e['total_inscritos'] / e['capacidade_maxima']) * 100) | round(1) %}
+            <div style="margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border);">
+                <h4>{{ e['titulo'] }} — <span style="color: var(--primary);">{{ e['total_inscritos'] }} / {{ e['capacidade_maxima'] }} inscritos ({{ ocupacao }}%)</span></h4>
+                {% set lista = inscritos_por_evento.get(e['id'], []) %}
+                {% if lista %}
+                <table>
+                    <tr><th>Participante</th><th>E-mail</th><th>Código Bilhete</th><th>Estado / Ação</th></tr>
+                    {% for ins in lista %}
+                    <tr>
+                        <td>{{ ins['nome'] }}</td>
+                        <td>{{ ins['email'] }}</td>
